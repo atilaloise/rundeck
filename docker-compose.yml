@@ -12,7 +12,7 @@ services:
       - ./mysql:/var/lib/mysql
   rundeck:
       hostname: rundeck
-      image: atilaloise/rundeck:3.3.5
+      image: atilaloise/rundeck
       depends_on:
         - "db"
       environment:

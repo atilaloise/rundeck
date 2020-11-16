@@ -26,21 +26,6 @@ if ls /opt/rundeck-plugins/* 1> /dev/null 2>&1; then
    chown -R rundeck:rundeck /var/lib/rundeck/libext
 fi
 
-# ACLS
-if ls /tmp/rundeck/ACLS/* 1> /dev/null 2>&1; then
-   echo "=>Configurando ACLS em /tmp/rundeck/ACLS"
-   chown -R rundeck:rundeck /tmp/rundeck/ACLS/*
-   cp -f /tmp/rundeck/ACLS/* /etc/rundeck/
-fi
-
-# SSH
-if ls /tmp/rundeck/ssh/* 1> /dev/null 2>&1; then
-   echo "=>Configurando SSH KEYS em /tmp/rundeck/ssh"
-   chown -R rundeck:rundeck /tmp/rundeck/ssh/*
-   cp -f /tmp/rundeck/ssh/* /var/lib/rundeck/.ssh/
-   chmod 0600 /var/lib/rundeck/.ssh/*
-   chmod 0644 /var/lib/rundeck/.ssh/*.pub
-fi
 
 if [ ! -f "${initfile}" ]; then
    SERVER_URL=${SERVER_URL:-"https://0.0.0.0:4443"}
@@ -83,7 +68,7 @@ if [ ! -f "${initfile}" ]; then
    RUNDECK_STORAGE_PROVIDER=${RUNDECK_STORAGE_PROVIDER:-"file"}
    RUNDECK_PROJECT_STORAGE_TYPE=${RUNDECK_PROJECT_STORAGE_TYPE:-"file"}
    #NO_LOCAL_MYSQL=${NO_LOCAL_MYSQL:-"false"}
-   SKIP_DATABASE_SETUP=${SKIP_DATABASE_SETUP:-"false"}
+   SKIP_DATABASE_SETUP=${SKIP_DATABASE_SETUP:-"true"}
    LOGIN_MODULE=${LOGIN_MODULE:-"RDpropertyfilelogin"}
    JAAS_CONF_FILE=${JAAS_CONF_FILE:-"jaas-loginmodule.conf"}
    KEYSTORE_PASS=${KEYSTORE_PASS:-"adminadmin"}
@@ -100,6 +85,16 @@ if [ ! -f "${initfile}" ]; then
    }
 
    echo "=>Inicializando rundeck - Isso pode demorar um pouco"
+
+    # SSH
+    if ls /tmp/rundeck/ssh/* 1> /dev/null 2>&1; then
+      echo "=>Configurando SSH KEYS em /tmp/rundeck/ssh"
+      chown -R rundeck:rundeck /tmp/rundeck/ssh/*
+      cp -f /tmp/rundeck/ssh/* /var/lib/rundeck/.ssh/
+      chmod 0600 /var/lib/rundeck/.ssh/*
+      chmod 0644 /var/lib/rundeck/.ssh/*.pub
+    fi
+    
    if [ ! -f /var/lib/rundeck/.ssh/id_rsa ]; then
        echo "=>Voce nao me passou nenhuma chave ssh. Gerando chaves ssh agora!"
        sudo -u rundeck ssh-keygen -t rsa -b 4096 -f /var/lib/rundeck/.ssh/id_rsa -N ''
@@ -111,6 +106,15 @@ if [ ! -f "${initfile}" ]; then
       cp -R /opt/rundeck-defaults/* /etc/rundeck
       chown -R rundeck:rundeck /etc/rundeck
    fi
+
+    # ACLS
+    if ls /tmp/rundeck/ACLS/* 1> /dev/null 2>&1; then
+      echo "=>Configurando ACLS em /tmp/rundeck/ACLS"
+      chown -R rundeck:rundeck /tmp/rundeck/ACLS/*
+      cp -rp /tmp/rundeck/ACLS/* /etc/rundeck/
+    fi
+
+
 
    if [ ! -f /etc/rundeck/ssl/truststore ]; then
        echo "=>Gerando certificados ssl"
