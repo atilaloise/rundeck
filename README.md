@@ -90,11 +90,22 @@ SKIP_DATABASE_SETUP - Setar para false caso queira que o conteiner provisione o 
 # Volumes
 
 ```
+/tmp/rundeck/ssh - Caso deseje configurar chaves ssh ou arquivos de configuração durante a inicialização do conteiner, coloque-os nesse volume. 
+
+/tmp/rundeck/ACLS - Caso queira sobrescrever ou copiar qualquer arquivo para /etc/rundeck durante a inicialização do conteiner, coloque-os nesse volume.
+
 /etc/rundeck - Persistencia de Arquivos de configuração do rundeck.
+
 /etc/locale.gen - Arquivo com locales que deve ser gerados na inicialização do conteiner.
+
 /var/lib/rundeck - Não recomendado para uso em volumes, pois contém o webapp. Para persistir as chaves ssh monte o volume: /var/lib/rundeck/.ssh
+
 /var/log/rundeck - Logs, Logs, Logs.
+
 /opt/rundeck-plugins - Para adicionar plugins externos durante a inicialização do conteiner
+
 /var/lib/rundeck/logs - Mais logs.
+
 /var/lib/rundeck/var/storage - Caso utilize o modo "file" para project storage, serão persistidos aqui. Monte esse volume caso for usar o plugin de SCM pois os arquivos ".git" ficam nesse diretório.
+
 ```
