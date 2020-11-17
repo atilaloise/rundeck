@@ -90,7 +90,7 @@ if [ ! -f "${initfile}" ]; then
     if ls /tmp/rundeck/ssh/* 1> /dev/null 2>&1; then
       echo "=>Configurando SSH KEYS em /tmp/rundeck/ssh"
       chown -R rundeck:rundeck /tmp/rundeck/ssh/*
-      cp -f /tmp/rundeck/ssh/* /var/lib/rundeck/.ssh/
+      cp -rp /tmp/rundeck/ssh/* /var/lib/rundeck/.ssh/
       chmod 0600 /var/lib/rundeck/.ssh/*
       chmod 0644 /var/lib/rundeck/.ssh/*.pub
     fi
