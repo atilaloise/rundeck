@@ -16,7 +16,7 @@ services:
       depends_on:
         - "db"
       environment:
-        - RUNDECK_ADMIN_PASSWORD=adVurgig0
+        - RUNDECK_ADMIN_PASSWORD=awawa
         - DATABASE_URL=jdbc:mysql://db/rundeck?autoReconnect=true
         - RUNDECK_USER=rundeck
         - RUNDECK_PASSWORD=rundeck
