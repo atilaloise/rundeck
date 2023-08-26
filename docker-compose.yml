@@ -1,34 +1,35 @@
-version: '2'
+# Basic docker-compose to run rundeck, mariadb, and nginx
+# Modify to suit your environment
+# Use of secrets file is highly recommended
+# MYSQL_ROOT_PASSWORD and DATABASE_ADMIN_PASSWORD need to be the same value
+# Add volumes to mariadb and rundeck sections to maintain persistence
+
+version: '3'
+
 services:
-  db:
-    image: mysql:5.7.31
-    environment:
-      - MYSQL_DATABASE=rundeck
-      - MYSQL_USER=rundeck
-      - MYSQL_PASSWORD=rundeck
-      - MYSQL_ROOT_PASSWORD=rundeck
-    command: --character-set-server=utf8 --collation-server=utf8_bin
-    volumes:
-      - ./mysql:/var/lib/mysql
-  rundeck:
-      hostname: rundeck
-      image: atilaloise/rundeck
-      depends_on:
-        - "db"
-      environment:
-        - RUNDECK_ADMIN_PASSWORD=awawa
-        - DATABASE_URL=jdbc:mysql://db/rundeck?autoReconnect=true
-        - RUNDECK_USER=rundeck
-        - RUNDECK_PASSWORD=rundeck
-        - DATABASE_ADMIN_USER=root
-        - DATABASE_ADMIN_PASSWORD=rundeck
-      volumes:
-        - ./rundeck/var/lib/rundeck/var/storage:/var/lib/rundeck/var/storage
-        - ./rundeck/opt/rundeck-plugins:/opt/rundeck-plugins
-        - ./rundeck/var/rundeck:/var/rundeck
-        - ./rundeck/var/lib/rundeck/.ssh:/var/lib/rundeck/.ssh
-        - ./rundeck/etc/rundeck:/etc/rundeck
-        - ./ssh_keys:/tmp/rundeck/ssh
-        - ./acls:/tmp/rundeck/ACLS
-      ports:
-        - "4440:4440"
+    mariadb:
+        image: mariadb:10.5.8
+        container_name: mariadb
+        restart: on-failure:5
+        environment:
+            MYSQL_ROOT_PASSWORD: "superpass"
+
+    rundeck:
+        image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+        container_name: rundeck
+        depends_on:
+            - mariadb
+        restart: on-failure:5
+        environment:
+            EXTERNAL_SERVER_URL: "http://rundeck.tests.local:4440"
+            #SERVER_URL: "http://localhost:4440"
+            NO_LOCAL_MYSQL: "true"
+            RUNDECK_STORAGE_PASSWORD: "superpass"
+            RUNDECK_STORAGE_PROVIDER: "db"
+            RUNDECK_PROJECT_STORAGE_TYPE: "db"
+            DATABASE_URL: "jdbc:mysql://mariadb/rundeckdb?autoReconnect=true"
+            DATABASE_ADMIN_USER: "root"
+            DATABASE_ADMIN_PASSWORD: "superpass"
+            RUNDECK_PASSWORD: "superpass"
+        ports:
+            - "4440:4440"
